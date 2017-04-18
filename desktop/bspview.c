@@ -2536,13 +2536,13 @@ NLM_EXTERN void Nlm_LaunchWebPage (Char *url)
     }
 #endif
 #ifdef WIN_MOTIF
-  argv [0] = "netscape";
+  argv [0] = "sensible-browser";
   argv [1] = url;
   argv [2] = NULL;
   child = fork();
   if(child == 0) {
-     if (execvp ("netscape", argv) == -1) {
-        Message (MSG_POST, "Unable to launch netscape");
+     if (execvp ("sensible-browser", argv) == -1) {
+        Message (MSG_POST, "Unable to launch browser");
         exit(-1);
     }
   }

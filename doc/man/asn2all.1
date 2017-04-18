@@ -1,10 +1,15 @@
-.TH ASN2ALL 1 2009-07-31 NCBI "NCBI Tools User's Manual"
+.TH ASN2ALL 1 2012-06-24 NCBI "NCBI Tools User's Manual"
 .SH NAME
 asn2all \- generate reports from ASN.1 biological data
 .SH SYNOPSIS
 .B asn2all
 [\|\fB\-\fP\|]
 [\|\fB\-A\fP\ \fIacc\fP\|]
+[\|\fB\-F\fP\ \fIfilename\fP\|]
+[\|\fB\-G\fP\|]
+[\|\fB\-J\fP\ \fIn\fP\|]
+[\|\fB\-K\fP\ \fIn\fP\|]
+[\|\fB\-M\fP\|]
 [\|\fB\-T\fP\|]
 [\|\fB\-X\fP\|]
 [\|\fB\-a\fP\ \fItype\fP\|]
@@ -65,8 +70,26 @@ A summary of options is included below.
 \fB\-\fP
 Print usage message
 .TP
-\fB\-A\fP\ \fIacc\fP
-Accession to fetch
+\fB\-A\fP\ \fIaccession\fP
+Accession to fetch; may take the form
+.IB accession , complexity , flags
+where \fIcomplexity\fP should normally be \fB0\fP and a \fIflags\fP
+value of \fB-1\fP enables fetching of external features
+.TP
+\fB\-F\fP\ \fIfilename\fP
+Accession Filter file
+.TP
+\fB\-G\fP
+Relaxed Genome Mapping
+.TP
+\fB\-J\fP\ \fIn\fP
+Seq-loc from
+.TP
+\fB\-K\fP\ \fIn\fP
+Seq-loc to
+.TP
+\fB\-M\fP
+Seq-loc Minus strand
 .TP
 \fB\-T\fP
 Use Threads
@@ -80,6 +103,8 @@ Input ASN.1 type:
 .PD 0
 .IP a
 Automatic (default)
+.IP c
+Catenated
 .IP z
 Any
 .IP e
@@ -110,10 +135,14 @@ Output Format:
 .PD 0
 .IP g
 GenBank/GenPept (default)
+.IP m
+GenBank Master Style
 .IP f
 FASTA
 .IP d
 CDS FASTA
+.IP e
+Gene FASTA
 .IP t
 Sequin-style 5-column feature table
 .IP y

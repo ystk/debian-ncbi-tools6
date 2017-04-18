@@ -1266,7 +1266,7 @@ NLM_EXTERN Nlm_CharPtr LIBCALL MergeStringArray (Nlm_CharPtr PNTR local, size_t 
   if (len < 1) return NULL;
 
   rsult = (Nlm_CharPtr) MemNew (len + 3);
-  if (rsult == NULL) return;
+  if (rsult == NULL) return NULL;
   tmp = rsult;
 
   for (i = 0; /* local [i] != NULL */ i < numitems; i++) {

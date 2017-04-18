@@ -67,6 +67,7 @@
 #pragma segment NlmSegA
 #endif
 
+extern Nlm_Int2 Nlm_Main(void) __attribute__((weak));
 
 /*****************************************************************************
 *
@@ -95,7 +96,12 @@ main(int argc, char *argv[])
   /* Initialize connection library's logger, registry and lock */
   CONNECT_Init(0);
 
-  retval = Nlm_Main();
+  if (Nlm_Main) {
+    retval = Nlm_Main();
+  } else {
+    ErrPost(0, 0, "Neither main nor Nlm_Main defined by program.");
+    retval = -1;
+  }
 
   NlmThreadJoinAll();
 

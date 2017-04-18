@@ -548,9 +548,8 @@ static Boolean NS_LoadNetscape(const char *url)
     }
 
     /* ---------- child process ------------ */
-    if (execlp("netscape", "netscape", url, NULL) < 0  &&
-        execl(NETSCAPE_PATH, NETSCAPE_PATH, url, NULL) < 0) {
-        Message(MSG_ERROR, "Failure to open URL in netscape window");
+    if (execlp("sensible-browser", "sensible-browser", url, NULL) < 0) {
+        Message(MSG_ERROR, "Failure to open URL in browser window");
         exit(1);
     }
 

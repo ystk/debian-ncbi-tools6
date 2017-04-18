@@ -3114,7 +3114,7 @@ static CharPtr Ing_FGetLine (FILE *fp)
         len++;
      }
      c = (Char)fgetc(fp);
-     if (c==EOF) {
+     if (c==(Char)EOF) {
        return NULL;
      }
   }

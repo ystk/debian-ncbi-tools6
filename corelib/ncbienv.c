@@ -828,6 +828,8 @@ static FILE* Nlm_OpenConfigFile(const Nlm_Char* file, Nlm_Boolean writeMode, Nlm
     if (fp == NULL) {
       path[0] = '\0';
       pth = getenv ("NCBI");
+      if (pth == NULL)
+	pth = "/etc/ncbi";
       if (pth != NULL) {
         Nlm_FileBuildPath(path, pth, str + 1);
         fp = Ncbienv_FileOpen (path, "r");

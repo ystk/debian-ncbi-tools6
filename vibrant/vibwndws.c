@@ -6789,7 +6789,7 @@ extern void Nlm_VibMainPrelude (int argc, char *argv[])
   Nlm_InitPrompt ();
   Nlm_InitSlate ();
   Nlm_InitTexts ();
-  if (! Nlm_SetupWindows ()) return;
+  if (! Nlm_SetupWindows ()) exit(1);
   Nlm_RegisterWindows ();
   Nlm_RegisterTexts ();
   Nlm_RegisterSlates ();

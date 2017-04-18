@@ -5616,7 +5616,7 @@ NLM_EXTERN void AlnMgr2PrintSeqAlign(SeqAlignPtr sap, Int4 linesize, Boolean isn
                spp = SeqPortNew(bsp, amp->from_row, amp->to_row, amp->strand, seqcode);
                ctr = SeqPortRead(spp, (Uint1Ptr)buf, amp->to_row-amp->from_row+1);
                buf[ctr] = '\0';
-               fprintf(ofp, buf);
+               fwrite(buf, 1, ctr, ofp);
                SeqPortFree(spp);
             }
          }

@@ -8661,7 +8661,7 @@ WriteAlignmentInterleaveToFileEx
                                          seqbuf, alnbuf, &alnbuf_len,
                                          show_substitutions);
               MemCpy (printed_line + label_len + 1 + coord_len, alnbuf, alnbuf_len);
-              fprintf (fp, printed_line);
+              fputs (fp, printed_line);
             }
             fprintf (fp, "\n");
             start = stop + 1;
@@ -8757,7 +8757,7 @@ extern void WriteAlignmentContiguousToFile
                                        seqbuf, alnbuf, &alnbuf_len,
                                        show_substitutions);
             MemCpy (printed_line, alnbuf, alnbuf_len);
-            fprintf (fp, printed_line);
+            fputs (fp, printed_line);
             start = stop + 1;
             stop += seq_chars_per_row;
           }

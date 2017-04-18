@@ -312,6 +312,7 @@
 
 #ifdef _PNG
 #include <png.h> /* must go berore ncbi headers */
+#include <zlib.h>
 #endif
 
 /* from ncbimisc.h */
@@ -327,7 +328,8 @@ NLM_EXTERN void LIBCALL Nlm_HeapSort PROTO((VoidPtr base, size_t nel, size_t wid
 #include <ddvcolor.h>
 
 #if defined(_OPENGL) && defined(_PNG)
-TOGL_Data *Cn3D_GetCurrentOGLData(void); /* in cn3dxprt.c */
+/* In cn3dxprt.c; declared weak here to avoid dependency loops. */
+extern TOGL_Data *Cn3D_GetCurrentOGLData(void) __attribute__((weak));
 #endif
 
 
@@ -2711,6 +2713,9 @@ void OGL_Reset(TOGL_Data * OGL_Data)
     if (OGL_Data == NULL)
         return;
 
+    if (!OGL_Data->BoundBox.set)
+        OGL_ClearBoundBox(&(OGL_Data->BoundBox));
+
     OGL_Data->MaxSize = (Nlm_FloatLo)
         fabs(OGL_Data->BoundBox.x[0] - OGL_Data->BoundBox.x[1]);
     diff = fabs(OGL_Data->BoundBox.y[0] - OGL_Data->BoundBox.y[1]);
@@ -2924,7 +2929,15 @@ void Nlm_SaveImagePNG(Nlm_Char *fname)
     png_structp png_ptr = NULL;
     png_infop info_ptr = NULL;
     Nlm_Boolean doInterlacing = TRUE;
-    TOGL_Data *OGL_Data = (TOGL_Data *)(Cn3D_GetCurrentOGLData());
+    TOGL_Data *OGL_Data;
+    
+    if (!Cn3D_GetCurrentOGLData) {
+      Message(MSG_ERROR, "PNG output unavailable; "
+	      "please relink application with -lncbicn3d.");
+      return;
+    }
+    
+    OGL_Data = (TOGL_Data *)(Cn3D_GetCurrentOGLData());
 
 #if defined(WIN_MOTIF)
     GLint glSize;
@@ -3153,8 +3166,11 @@ void Nlm_SaveImagePNG(Nlm_Char *fname)
         Message(MSG_ERROR, "Can't create PNG info structure");
         goto cleanup;
     }
-
+#if PNG_LIBPNG_VER_MAJOR >= 1 && PNG_LIBPNG_VER_MINOR >= 4
+	if (setjmp(png_jmpbuf(png_ptr))) {
+#else
     if (setjmp(png_ptr->jmpbuf)) {
+#endif
         Message(MSG_ERROR, "PNG write failed");
         goto cleanup;
     }
@@ -3705,4 +3721,3 @@ void Nlm_AddHalfWorm3D(Nlm_Picture3D pic,
     if (fblock)
         MemFree(fblock);
 }
-

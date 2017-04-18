@@ -1,4 +1,4 @@
-#	makefile for asntool and ncbi core routines,
+#	-*- makefile -*- for asntool and ncbi core routines,
 #
 #	$Id: makeall.unx,v 6.310 2012/03/08 23:03:59 ucko Exp $
 #
@@ -233,7 +233,7 @@ SRC20 = drawseq.c dotmatrx.c fea2seg.c fstyle.c smdlg1.c smdlg2.c smdlg3.c \
 	dlgutil1.c dlgutil2.c e2trmlst.c e2docsum.c asn2graphic.c \
 	medview.c bspview.c gbfview.c gphview.c gphdraw.c gxydraw.c gtrdraw.c \
 	seqpanel.c ingengraph.c ingenext.c ingenwin.c macrodlg.c \
-	biosrc.c cdrgn.c import.c pubdesc.c seqsub.c mapgene.c prtgene.c salogif.c
+	biosrc.c cdrgn.c import.c pubdesc.c seqsub.c mapgene.c prtgene.c
 
 SRC45 = ddvclick.c ddvgraph.c ddvopen.c ddvpanel.c
 
@@ -388,7 +388,7 @@ OBJ20 = drawseq.o dotmatrx.o fea2seg.o fstyle.o smdlg1.o smdlg2.o smdlg3.o \
 	dlgutil1.o dlgutil2.o e2trmlst.o e2docsum.o asn2graphic.o \
 	medview.o bspview.o gbfview.o gphview.o gphdraw.o gxydraw.o gtrdraw.o \
 	seqpanel.o ingengraph.o ingenext.o ingenwin.o macrodlg.o \
-	biosrc.o cdrgn.o import.o pubdesc.o seqsub.o mapgene.o prtgene.o salogif.o
+	biosrc.o cdrgn.o import.o pubdesc.o seqsub.o mapgene.o prtgene.o
 
 OBJ45 = ddvclick.o ddvgraph.o ddvopen.o ddvpanel.o
 
@@ -486,14 +486,14 @@ ln-if-absent:	../make/ln-if-absent
 nocopy : sources $(THR_OBJ) $(LIB1) $(LIB2) $(LIB3) $(DLIB4) $(DLIB400) \
 	$(LIB5) $(DLIB20) $(DLIB45) $(LIB22) $(LIB23) $(LIBCOMPADJ) \
 	$(DLIB28) $(DLIB30) $(DLIB3000) \
-	$(DLIB34) $(DLIB37) $(DLIB38) $(LIB50) $(LIB60) $(LIB61) $(NCBI_SHLIBS)
+	$(DLIB34) $(DLIB37) $(DLIB38) $(LIB60) $(LIB61) $(NCBI_SHLIBS)
 
 sources : $(SRCALL)
 
 ## To clean out the directory without removing make
 ##
 clean :
-	-rm -f *.[acho]
+	-rm -f *.[acho] *.glo
 
 .NO_PARALLEL:	copy $(ULIB4) $(ULIB30)
 
@@ -649,10 +649,12 @@ shlib.sol :
 	cd ../shlib; make -f $(MAKESHLIB) `ls *.a | sed "s/\.a/.so/"` NCBI_OTHERLIBS=$(OTHERLIBS)
 	rm -f ../shlib/*.a
 
-#
-# Linux shared libs are built the same in the same manner as for SGI
-#
-shlib.lnx : shlib.sgi
+shlib.lnx :
+	-mkdir ../shlib
+	-rm -f ../shlib/*.a
+	ln $(NCBI_LIBDIR)/*.a ../shlib
+	cd ../shlib; make -f $(MAKESHLIB) `ls *.a | sed "s/\.a/.so.$(NCBI_VERSION_MAJOR)/"` SH1="$(CC) -o" SH2="-shared *.o"
+	rm -f ../shlib/*.a
 
 shlib.sgi :
 	-mkdir ../shlib
@@ -782,7 +784,7 @@ copy :
 	cp -fp ../algo/blast/core/*.h ../include/algo/blast/core
 	- mkdir -p ../include/algo/blast/composition_adjustment
 	$(SRCCOPY) ../algo/blast/composition_adjustment/*.c .
-	$(SRCCOPY) ../algo/blast/composition_adjustment/*.h ../include
+#	$(SRCCOPY) ../algo/blast/composition_adjustment/*.h ../include
 	cp -fp ../algo/blast/composition_adjustment/*.h \
 		../include/algo/blast/composition_adjustment
 	- mkdir -p ../include/algo/blast/api

@@ -2088,7 +2088,7 @@ static void SPI_PrintResult(FILE *ofp, FILE *ofp2, SPI_RegionInfoPtr srip, Biose
                           fprintf(ofp2, " ");
                           ctr++;
                       }
-                      fprintf(ofp2, buf);
+                      fwrite(buf, 1, ctr, ofp2);
                       if (spp){
                           SeqPortFree(spp);
                       }
@@ -2417,7 +2417,7 @@ static void SPI_PrintHerdResult(FILE *ofp, FILE *ofp2, SPI_mRNAToHerdPtr herd, S
                         ctr = SeqPortRead(spp, (Uint1Ptr)buf, 10);
                         if (ctr > 0)
                            buf[ctr] = '\0';
-                        fprintf(ofp2, buf);
+                        fwrite(buf, 1, ctr, ofp2);
                         SeqPortFree(spp);
                      }
                      done = TRUE;

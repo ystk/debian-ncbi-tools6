@@ -1769,14 +1769,14 @@ static CharPtr DrawTextToBuffer(ValNodePtr tdp_list, CharPtr PNTR m_buf, Boolean
 					/*check box for getting sequence*/
 					if(options&TXALIGN_HTML&&options&TXALIGN_MASTER&&DbHasGi&&(options&TXALIGN_GET_SEQUENCE)){
 					  Char checkboxBuf[200];
-					  sprintf(checkboxBuf, "<input type=\"checkbox\" name=\"getSeqGi\" value=\"%d\" onClick=\"synchronizeCheck(this.value, 'getSeqAlignment%d', 'getSeqGi', this.checked)\">", sip->data.intvalue, query_number_glb);
-					  sprintf(docbuf+pos,checkboxBuf);
+					  snprintf(checkboxBuf, 200, "<input type=\"checkbox\" name=\"getSeqGi\" value=\"%d\" onClick=\"synchronizeCheck(this.value, 'getSeqAlignment%d', 'getSeqGi', this.checked)\">", sip->data.intvalue, query_number_glb);
+					  snprintf(docbuf+pos, size-pos, "%s", checkboxBuf);
 					  
 					  pos += StringLen(checkboxBuf);
 					}
 				
 					html_len = StringLen(HTML_buffer);
-					sprintf(docbuf+pos, HTML_buffer);
+					snprintf(docbuf+pos, size-pos, "%s", HTML_buffer);
 					pos += html_len;
 				
 					pos += print_label_to_buffer_all_ex(docbuf+pos, tdp->label, tdp->pos, 
@@ -1793,7 +1793,8 @@ static CharPtr DrawTextToBuffer(ValNodePtr tdp_list, CharPtr PNTR m_buf, Boolean
                                             sprintf(HTML_buffer, "<a name = THC%ld></a><a href=\"http://www.tigr.org/docs/tigr-scripts/hgi_scripts/thc_report.spl?est=THC%ld&report_type=n\">", (long) oip->id, (long) oip->id);
                                             
                                             html_len = StringLen(HTML_buffer);
-                                            sprintf(docbuf+pos, HTML_buffer);
+                                            snprintf(docbuf+pos, size-pos, "%s",
+                                                     HTML_buffer);
                                             pos += html_len;
                                             pos += print_label_to_buffer_all_ex(docbuf+pos, tdp->label, tdp->pos, 
 					    		tdp->strand, FALSE, TRUE, label_size, num_size, show_strand, strip_semicolon);
@@ -1802,7 +1803,8 @@ static CharPtr DrawTextToBuffer(ValNodePtr tdp_list, CharPtr PNTR m_buf, Boolean
                                             sprintf(HTML_buffer, "<a name = TI%ld></a><a href=\"http://www.ncbi.nlm.nih.gov/Traces/trace.cgi?cmd=retrieve&dopt=fasta&val=%ld\">", (long) oip->id, (long) oip->id);
                                             
                                             html_len = StringLen(HTML_buffer);
-                                            sprintf(docbuf+pos, HTML_buffer);
+                                            snprintf(docbuf+pos, size-pos, "%s",
+                                                     HTML_buffer);
                                             pos += html_len;
                                             pos += print_label_to_buffer_all_ex(docbuf+pos, tdp->label, tdp->pos, 
 					    		tdp->strand, FALSE, TRUE, label_size, num_size, show_strand, strip_semicolon);
@@ -1818,8 +1820,8 @@ static CharPtr DrawTextToBuffer(ValNodePtr tdp_list, CharPtr PNTR m_buf, Boolean
 		if(!load){
 		  if(options&TXALIGN_HTML&&options&TXALIGN_MASTER&&DbHasGi&&(options&TXALIGN_GET_SEQUENCE)){
 		    Char checkboxBuf[200];
-		    sprintf(checkboxBuf, "<input type=\"checkbox\" name=\"getSeqMaster\" value=\"\" onClick=\"uncheckable('getSeqAlignment%d', 'getSeqMaster')\">", query_number_glb);
-		    sprintf(docbuf+pos,checkboxBuf);
+		    snprintf(checkboxBuf, 200, "<input type=\"checkbox\" name=\"getSeqMaster\" value=\"\" onClick=\"uncheckable('getSeqAlignment%d', 'getSeqMaster')\">", query_number_glb);
+		    snprintf(docbuf+pos, size-pos, "%s", checkboxBuf);
 		  
 		    pos += StringLen(checkboxBuf);
 		  }
@@ -6300,7 +6302,7 @@ static Boolean OOFShowSingleAlignment(SeqAlignPtr sap, ValNodePtr mask,
             if(seq_int1 != NULL) {
                 
                 /* This line should be checked for correctness */
-                if((line1[line_index] = BSGetByte(b_store)) == EOF)
+                if((line1[line_index] = BSGetByte(b_store)) == (Char)EOF)
                     line1[line_index] = '?';
                 
                 if(dna_strand != Seq_strand_minus)

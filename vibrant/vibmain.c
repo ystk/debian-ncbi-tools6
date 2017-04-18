@@ -44,6 +44,21 @@
 
 
 
+extern Nlm_Int2 Nlm_Main(void) __attribute__((weak));
+
+static Nlm_Int2 s_CallNlmMain(void)
+{
+  if (Nlm_Main) {
+    return Nlm_Main();
+  } else {
+    ErrPost(0, 0, "Neither main nor Nlm_Main defined by program.");
+    return -1;
+  }
+}
+
+#define Nlm_Main s_CallNlmMain
+
+
 #ifdef WIN_MAC
 #ifdef OS_UNIX_DARWIN
 int main (int argc, char *argv[]) 

@@ -2998,8 +2998,7 @@ Char DefLine[255];
 			if (szSeq){
 				if (!DDV_GetSequenceFromParaG(pgp,&szSeq,bspLength,IsAA,NULL,
 					NULL,NULL)) continue;
-				fprintf(fp,szSeq);
-				fprintf(fp,"\n");
+				fprintf(fp, "%s\n", szSeq);
 				MemFree(szSeq);
 			}
 			vnp=vnp->next;

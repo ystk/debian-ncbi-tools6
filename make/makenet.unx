@@ -1,4 +1,4 @@
-#   makefile for network demo programs and network entrez
+#   -*- makefile -*- for network demo programs and network entrez
 #
 #	$Id: makenet.unx,v 6.246 2011/04/26 15:32:34 ucko Exp $
 #   test, ignore
@@ -323,6 +323,8 @@ OBJ46 = id2.o id2sgen.o
 
 # objects & sources needed for versions of network demo programs
 
+OBJCN3D =       cn3dmain.o
+
 OBJDDV = ddvmain.o
 
 OBJUDV = udvmain.o
@@ -438,10 +440,12 @@ shlib.sol :
 	cd ../shlib; make -f $(MAKESHLIB) `ls *.a | sed "s/\.a/.so/"` NCBI_OTHERLIBS=$(OTHERLIBS)
 	rm -f ../shlib/*.a
 
-#
-# Linux shared libs are built the same in the same manner as for SGI
-#
-shlib.lnx : shlib.sgi
+shlib.lnx :
+	-mkdir ../shlib
+	-rm -f ../shlib/*.a
+	ln $(NCBI_LIBDIR)/*.a ../shlib
+	cd ../shlib; make -f $(MAKESHLIB) `ls *.a | sed "s/\.a/.so.$(NCBI_VERSION_MAJOR)/"` SH1="$(CC) -o" SH2="-shared *.o"
+	rm -f ../shlib/*.a
 
 shlib.sgi :
 	-mkdir ../shlib
@@ -511,7 +515,7 @@ copy :
 	$(SRCCOPY) ../network/vibnet/*.h ../include
 	$(SRCCOPY) ../cdromlib/*.h ../include
 	-$(SRCCOPY) ../network/wwwblast/Src/*.c .
-	-$(SRCCOPY) ../network/wwwblast/Src/*.h ../include
+#	-$(SRCCOPY) ../network/wwwblast/Src/*.h ../include
 	$(SRCCOPY) ../cdromlib/accentr.c .
 	$(SRCCOPY) ../cdromlib/accutils.c .
 	-$(SRCCOPY) ../sequin/*.* .
@@ -930,17 +934,18 @@ acclinkos.o : acclinkos.c
 ##
 
 
+Cn3D : $(OBJCN3D) $(BENTREZLIBS) netentcf $(BLIB36)
+	$(CC) -o Cn3D $(LDFLAGS) $(OBJCN3D) $(LIB31) $(LIB3000) $(LIB20) \
+		$(LIB45) $(LIB22) $(LIB8) $(LIB7) \
+		$(LIB400) $(LIB2) $(LIB1) $(VIBLIBS) $(OGLLIBS)
+
 ddv    : $(OBJDDV)
-	$(CC) -o ddv $(LDFLAGS) $(OBJDDV) $(LIB41) $(LIB31) $(LIB20) $(LIB61) $(LIB60) $(LIB22) $(LIB45) \
-	$(LIB8) $(LIB7) $(NETCLILIB) $(LIB3) $(LIB4) $(LIB23) \
-	$(LIBCOMPADJ) $(LIB2) $(LIB1) \
-	$(VIBLIBS) $(OTHERLIBS)
+	$(CC) -o ddv $(LDFLAGS) $(OBJDDV) $(LIB31) $(LIB20) $(LIB45) \
+	$(LIB8) $(LIB7) $(LIB4) $(LIB2) $(LIB1) $(VIBLIBS)
 
 udv    : $(OBJUDV)
-	$(CC) -o udv $(LDFLAGS) $(OBJUDV) $(LIB41) $(LIB31) $(LIB20) $(LIB61) $(LIB60) $(LIB22) $(LIB45) \
-	$(LIB8) $(LIB7) $(NETCLILIB) $(LIB3) $(LIB4) \
-	$(LIB23) $(LIBCOMPADJ) $(LIB2) \
-	$(LIB1) $(VIBLIBS) $(OTHERLIBS)
+	$(CC) -o udv $(LDFLAGS) $(OBJUDV) $(LIB31) $(LIB20) \
+	$(LIB8) $(LIB7) $(LIB4) $(LIB2) $(LIB1) $(VIBLIBS)
 
 Nentrez : entrez.c $(ULIB31)
 	$(CC) -o Nentrez $(LDFLAGS) entrez.c $(LIB41) $(LIB31) $(LIB30) $(LIB20) $(LIB61) $(LIB60) $(LIB22) $(LIB45) \
@@ -986,8 +991,7 @@ aceread_tst :	aceread_tst.c
 
 # asn2gb program (asn2gb)
 asn2gb :	asn2gb.c
-	$(CC) -g -o asn2gb $(LDFLAGS) asn2gb.c $(LIB41) $(NETCLILIB) \
-		$(LIB23) $(LIBCOMPADJ) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o asn2gb $(LDFLAGS) asn2gb.c $(LIB23) $(LIB2) $(LIB1)
 
 # asn2gb_psf, uses PUBSEQBioseqFetchEnable instead of PubSeqFetchEnable
 # should be used only internally within NCBI.
@@ -998,9 +1002,8 @@ asn2gb_psf :	asn2gb.c
 
 # asn2fsa program (asn2fsa)
 asn2fsa :	asn2fsa.c
-	$(CC) -g -o asn2fsa $(LDFLAGS) asn2fsa.c $(THREAD_OBJ) $(LIB41) \
-		$(NETCLILIB) $(LIB23) $(LIBCOMPADJ) $(LIB2) $(LIB1) \
-		$(OTHERLIBS) $(THREAD_OTHERLIBS)
+	$(CC) -g -o asn2fsa $(LDFLAGS) asn2fsa.c $(THREAD_OBJ) \
+		$(LIB23) $(LIB2) $(LIB1) $(THREAD_OTHERLIBS)
 
 # asn2fsa_psf, uses PUBSEQBioseqFetchEnable instead of PubSeqFetchEnable
 # should be used only internally within NCBI.
@@ -1011,14 +1014,12 @@ asn2fsa_psf :	asn2fsa.c
 
 # asn2all program (asn2all)
 asn2all :	asn2all.c
-	$(CC) -g -o asn2all $(LDFLAGS) asn2all.c $(THREAD_OBJ) $(LIB41) \
-		$(NETCLILIB) $(LIB23) $(LIBCOMPADJ) $(LIB2) $(LIB1) \
-		$(OTHERLIBS) $(THREAD_OTHERLIBS)
+	$(CC) -g -o asn2all $(LDFLAGS) asn2all.c $(THREAD_OBJ) $(LIB2) $(LIB1) \
+		$(THREAD_OTHERLIBS)
 
 # tbl2asn
 tbl2asn : tbl2asn.c 
-	$(CC) -o tbl2asn $(LDFLAGS) tbl2asn.c $(LIB23) $(LIBCOMPADJ) \
-		$(LIB2) $(NETCLILIB) $(LIB1) $(OTHERLIBS)
+	$(CC) -o tbl2asn $(LDFLAGS) tbl2asn.c $(LIB23) $(LIB2) $(LIB1)
 
 # tbl2asn_psf, uses PUBSEQBioseqFetchEnable instead of PubSeqFetchEnable
 # should be used only internally within NCBI.
@@ -1034,13 +1035,12 @@ raw2delt : raw2delt.c
 
 # gene2xml program (gene2xml)
 gene2xml :	gene2xml.c
-	$(CC) -g -o gene2xml $(LDFLAGS) gene2xml.c $(NETCLILIB) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o gene2xml $(LDFLAGS) gene2xml.c $(LIB2) $(LIB1)
 
 # asnval program (asnval)
 asnval :	asnval.c
-	$(CC) -g -o asnval $(LDFLAGS) asnval.c $(THREAD_OBJ) $(LIB41) \
-		$(NETCLILIB) $(LIB23) $(LIBCOMPADJ) $(LIB2) $(LIB1) \
-		$(OTHERLIBS) $(THREAD_OTHERLIBS)
+	$(CC) -g -o asnval $(LDFLAGS) asnval.c $(THREAD_OBJ) $(LIB2) $(LIB1) \
+		$(THREAD_OTHERLIBS)
 
 # asnval_psf, uses PUBSEQBioseqFetchEnable instead of PubSeqFetchEnable
 # should be used only internally within NCBI.
@@ -1059,8 +1059,7 @@ asnval_dbx_psf :	asnval.c
 # asndisc program (asndisc)
 asndisc :	asndisc.c
 	$(CC) -g -o asndisc $(LDFLAGS) asndisc.c $(THREAD_OBJ) $(LIB41) \
-		$(NETCLILIB) $(LIB23) $(LIBCOMPADJ) $(LIB2) $(LIB1) \
-		$(OTHERLIBS) $(THREAD_OTHERLIBS)
+		$(LIB23) $(LIB2) $(LIB1) $(THREAD_OTHERLIBS)
 
 # asndisc_psf, uses PUBSEQBioseqFetchEnable instead of PubSeqFetchEnable
 # should be used only internally within NCBI.
@@ -1083,8 +1082,8 @@ demo_aceread_tst :	aceread_tst.c
 
 # asnmacro
 asnmacro : asnmacro.c 
-	$(CC) -o asnmacro $(LDFLAGS) asnmacro.c $(LIB61) $(LIB60) $(LIB23) $(LIBCOMPADJ) \
-		$(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -o asnmacro $(LDFLAGS) asnmacro.c $(LIB61) $(LIB60) $(LIB23) \
+		$(LIB2) $(LIB1)
 
 # asnstrip program (asnstrip)
 asnstrip : asnstrip.c 
@@ -1108,28 +1107,23 @@ diffshift :	diffshift.c
 
 # gbseqget program (gbseqget)
 gbseqget :	gbseqget.c
-	$(CC) -g -o gbseqget $(LDFLAGS) gbseqget.c $(LIB41) $(NETCLILIB) \
-		$(LIB23) $(LIBCOMPADJ) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o gbseqget $(LDFLAGS) gbseqget.c $(LIB2) $(LIB1)
 
 # insdseqget program (insdseqget)
 insdseqget :	insdseqget.c
-	$(CC) -g -o insdseqget $(LDFLAGS) insdseqget.c $(LIB41) $(NETCLILIB) \
-		$(LIB23) $(LIBCOMPADJ) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o insdseqget $(LDFLAGS) insdseqget.c $(LIB2) $(LIB1)
 
 # nps2gps program (nps2gps)
 nps2gps :	nps2gps.c
-	$(CC) -g -o nps2gps $(LDFLAGS) nps2gps.c $(LIB23) $(LIBCOMPADJ) \
-		$(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o nps2gps $(LDFLAGS) nps2gps.c $(LIB23) $(LIB2) $(LIB1)
 
 # trna2sap program (trna2sap)
 trna2sap :	trna2sap.c
-	$(CC) -g -o trna2sap $(LDFLAGS) trna2sap.c $(LIB23) $(LIBCOMPADJ) \
-		$(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o trna2sap $(LDFLAGS) trna2sap.c $(LIB2) $(LIB1)
 
 # trna2tbl program (trna2tbl)
 trna2tbl :	trna2tbl.c
-	$(CC) -g -o trna2tbl $(LDFLAGS) trna2tbl.c $(LIB23) $(LIBCOMPADJ) \
-		$(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o trna2tbl $(LDFLAGS) trna2tbl.c
 
 # Entrez2 service test program (testent2)
 testent2 :	testent2.c
@@ -1138,15 +1132,14 @@ testent2 :	testent2.c
 
 # network Entrez2 application (entrez2)
 entrez2 :	entrez2.c
-	$(CC) -g -o entrez2 $(LDFLAGS) entrez2.c $(LIB41) $(LIB6) $(LIB20) \
-		$(LIB61) $(LIB60) $(LIB22) $(LIB23) $(LIBCOMPADJ) \
-		$(LIB2) $(LIB4) $(LIB1) $(VIBLIBS) $(OTHERLIBS)
+	$(CC) -g -o entrez2 $(LDFLAGS) entrez2.c $(LIB20) \
+		$(LIB2) $(LIB4) $(LIB1) $(VIBLIBS)
 	$(VIB_POST_LINK) entrez2
 
 # demo program (spidey)
 spidey :	spideymain.c
 	$(CC) -o spidey $(LDFLAGS) spideymain.c $(LIB41) $(LIB23) \
-		$(LIBCOMPADJ) $(LIB6) $(LIB2) $(LIB1) $(OTHERLIBS)
+		 $(LIB2) $(LIB1)
 
 # demo program dotmatrix
 dotmatrix :	dotmain.c
@@ -1174,12 +1167,12 @@ asn2fast : asn2fast.c
 # demo program (asn2asn)
 
 asn2asn : asn2asn.c
-	$(CC) -o asn2asn $(LDFLAGS) asn2asn.c $(LIB41) $(LIB6) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -o asn2asn $(LDFLAGS) asn2asn.c $(LIB2) $(LIB1)
 
 # demo program (cleanasn)
 
 cleanasn : cleanasn.c
-	$(CC) -o cleanasn $(LDFLAGS) cleanasn.c $(LIB41) $(LIB23) $(LIB6) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -o cleanasn $(LDFLAGS) cleanasn.c $(LIB23) $(LIB2) $(LIB1)
 
 # cleanasn_psf, uses PUBSEQBioseqFetchEnable instead of PubSeqFetchEnable
 # should be used only internally within NCBI.
@@ -1218,27 +1211,25 @@ id0test: id0test.c $(BNETCLILIB) $(BLIB13)
 	$(CC) -g -o id0test $(LDFLAGS) id0test.c $(LIB13) $(NETCLILIB) $(LIB2) $(LIB1) $(OTHERLIBS)
 
 idfetch: idfetch.c $(BNETCLILIB) $(BLIB41)
-	$(CC) -g -o idfetch $(LDFLAGS) idfetch.c $(LIB41) $(NETCLILIB) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -g -o idfetch $(LDFLAGS) idfetch.c $(LIB41) $(LIB2) $(LIB1)
 
 # gapped BLAST client
 # blastcl3 now has the same source code as blastall but should be compiled
 # with -DBLAST_CS_API flag
 blastcl3: blastall.c $(BNETCLILIB) $(BLIB36)
 	$(CC) -g -o blastcl3 $(LDFLAGS) -DBLAST_CS_API blastall.c \
-		$(LIB61) $(LIB60) $(LIB36) $(LIB23) $(LIBCOMPADJ) \
-		$(NETCLILIB) $(LIB2) $(LIB1) $(OTHERLIBS)
+		$(LIB61) $(LIB60) $(LIB36) $(LIB23) $(LIB2) $(LIB1)
 
 # BLAST 2 sequences
 # Uses network libraries to access Entrez for retrieving sequences by gi/accession
 bl2seq : bl2seq.c
 	$(CC) -o bl2seq $(LDFLAGS) bl2seq.c $(LIB61) $(LIB60) $(LIB23) \
-		$(LIBCOMPADJ) $(LIB41) $(NETCLILIB) $(LIB2) $(LIB1) \
-		$(OTHERLIBS)
+		$(LIB41) $(LIB2) $(LIB1)
 
 taxblast: taxblast_main.c $(BLIB41) $(BLIB40)
 	$(CC) -g -o taxblast $(LDFLAGS) taxblast_main.c \
-		$(LIB61) $(LIB60) $(LIB36) $(LIB41) $(LIB40) $(LIB23) $(LIBCOMPADJ) \
-		$(NETCLILIB) $(LIB2) $(LIB1) $(OTHERLIBS)
+		$(LIB61) $(LIB60) $(LIB36) $(LIB41) $(LIB40) $(LIB23) \
+		$(LIB2) $(LIB1) $(OTHERLIBS)
 
 # test client for the suggest network service
 suggcli: suggcli.c $(BNETCLILIB) $(BLIB24)
@@ -1250,11 +1241,11 @@ suggsrv : suggsrv.c $(BSRVNETCLILIB) $(BLIB24) $(NCBI_SHLIBS).alt2
 
 # 'query' program used as WWW Entrez server
 query : query.c sumutils.c $(BLIB27) $(BLIB25) $(BLIB22)
-	$(CC) -o query $(LDFLAGS) query.c sumutils.c $(LIB25) $(LIB27) $(LIB22) $(LIB5) $(LIB3) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -o query $(LDFLAGS) query.c sumutils.c $(LIB25) $(LIB27) $(LIB22) $(LIB41) $(LIB5) $(LIB3) $(LIB2) $(LIB1) $(OTHERLIBS)
 
 # 'query' program used as WWW Entrez server
 Nquery : query.c sumutils.c $(BLIB27) $(BLIB25) $(BLIB22) $(BENTREZLIBS)
-	$(CC) -o Nquery $(LDFLAGS) query.c sumutils.c $(LIB25) $(LIB27) $(LIB22) $(ENTREZLIBS) $(LIB2) $(LIB1) $(OTHERLIBS)
+	$(CC) -o Nquery $(LDFLAGS) query.c sumutils.c $(LIB25) $(LIB27) $(LIB22) $(LIB41) $(ENTREZLIBS) $(LIB2) $(LIB1) $(OTHERLIBS)
 
 
 # srchnt - pattern match REN search
@@ -1419,9 +1410,8 @@ Psequin : $(SRCSEQUIN) $(BENTREZLIBS) $(BLIB61) $(BLIB60) $(BLIB23) \
 	$(BLIB11) $(BLIB8) $(BLIB7) $(NETCLIBLIB) $(BLIB5) $(BLIB4) $(BLIB3) \
 	$(BLIB2) $(BLIB1) $(ULIB31)
 	$(CC) -o Psequin -I. $(LDFLAGS) -UINTERNAL_NCBI_SEQUIN $(SRCSEQUIN) \
-	$(LIB30) $(LIB45) $(LIB31) $(LIB20) $(LIB61) $(LIB60) $(LIB22) \
-	$(LIB40) $(LIB41) $(LIB36) $(LIB23) $(LIBCOMPADJ) $(LIB11) \
-	$(ENTREZLIBS) $(LIB4) $(LIB2) $(LIB1) $(VIBLIBS) $(OTHERLIBS)
+	$(LIB31) $(LIB20) $(LIB61) $(LIB36) $(LIB23) $(LIB11) \
+	$(LIB4) $(LIB2) $(LIB1) $(VIBLIBS)
 	$(VIB_POST_LINK) Psequin
 
 # 'sbtedit' Submission Template Editor
@@ -1431,9 +1421,7 @@ sbtedit : $(SRCSBTEDIT) $(BENTREZLIBS) $(BLIB61) $(BLIB60) $(BLIB23) \
 	$(BLIB11) $(BLIB8) $(BLIB7) $(NETCLIBLIB) $(BLIB5) $(BLIB4) $(BLIB3) \
 	$(BLIB2) $(BLIB1) $(ULIB31)
 	$(CC) -o sbtedit -I. $(LDFLAGS) -UINTERNAL_NCBI_SEQUIN $(SRCSBTEDIT) \
-	$(LIB30) $(LIB45) $(LIB31) $(LIB20) $(LIB61) $(LIB60) $(LIB22) \
-	$(LIB40) $(LIB41) $(LIB36) $(LIB23) $(LIBCOMPADJ) $(LIB11) \
-	$(ENTREZLIBS) $(LIB4) $(LIB2) $(LIB1) $(VIBLIBS) $(OTHERLIBS)
+	$(LIB20) $(LIB23) $(LIB4) $(LIB2) $(LIB1) $(VIBLIBS)
 	$(VIB_POST_LINK) sbtedit
 
 # 'streamer' Sequinesque Stream Editor

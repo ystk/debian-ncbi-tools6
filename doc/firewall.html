@@ -133,7 +133,7 @@ in case the public access will eventually be enabled on this port as well.
 
 <p>
 To see what ports are currently on, and their status, as reported within
-NCBI, please refer to the following <a href="fwd_check.cgi">Firewall Daemon Presence
+NCBI, please refer to the following <a href="http://www.ncbi.nlm.nih.gov/IEB/ToolBox/NETWORK/fwd_check.cgi">Firewall Daemon Presence
 Check</a> page.  Ports marked <b>INTERNAL</b> are solely for NCBI own use, and may be
 inaccessible from your site. That, however, does not affect availability of any
 services that NCBI provides through other (open) firewall ports.
@@ -143,7 +143,7 @@ TROUBLESHOOTING:  You can test whether these special ports are connectable from
 your host just by running simple <tt>telnet</tt> command (available on most
 current systems).  To know which ports, at the moment, you should be trying
 from the list above (see the "Ports to open"), first check their status by visiting
-<a href="fwd_check.cgi">Firewall Daemon Presence Check</a> link, then select any
+<a href="http://www.ncbi.nlm.nih.gov/IEB/ToolBox/NETWORK/fwd_check.cgi">Firewall Daemon Presence Check</a> link, then select any
 up-and-running port and do the following (the example assumes port 5861 has
 been shown in operational state):
 <pre>
@@ -175,7 +175,7 @@ functions of NCBI dispatching facilities.
 
 <p>
 There is also an auxiliary automated UNIX shell script
-<a href="fwd_check.sh">fwd_check.sh</a> to check all of
+<a href="../libncbi6/examples/fwd_check.sh">fwd_check.sh</a> to check all of
 the preset ports, and it is kept in-sync with currently
 configured open ports (so remember to refresh your download
 prior to actual use).

@@ -1,4 +1,4 @@
-#
+# -*- makefile -*-
 #
 #	$Id: makeshlb.unx,v 6.1 1999/03/18 17:31:11 beloslyu Exp $
 #
@@ -12,7 +12,112 @@ SH1 = ld -G -o
 SH2 = `lorder *.o | tsort` $(NCBI_OTHERLIBS)
 
 %.so: %.a
-	rm -f *.o __*
+	rm -f *.o *.glo __*
 	ar x $<
+	case $< in \
+	    *OGL.a) for f in *.glo; do mv $$f `basename $$f .glo`.o; done ;; \
+	esac
 	$(SH1) $@ $(SH2)
 	rm -f *.o __*
+
+so=so.$(NCBI_VERSION_MAJOR).$(NCBI_VERSION_MINOR)
+
+%.$(so): %.a
+	$(CC) -shared -Wl,-soname=$*.so.$(NCBI_VERSION_MAJOR) -o $@ \
+	    -Wl,--whole-archive $< -Wl,--no-whole-archive $(LDFLAGS) \
+	    $($*_deps) $($*_sysdeps)
+
+%.so.$(NCBI_VERSION_MAJOR): %.$(so)
+	ln -s $< $@
+	ln -s $< $*.so
+
+# Make libncbiCacc and libncbiacc pointers to libncbiNacc, since it's
+# the most useful variant in the usual (net-only) case.  Do the same
+# for libnetentr, and link the static version into libncbiNacc.so, due
+# to a circular dependency.
+libnetentr.$(so) libncbiCacc.$(so) libncbiacc.$(so):
+	ln -s libncbiNacc.$(so) $@
+
+# Standardize on the OpenGL-enabled versions of Vibrant, since there's
+# no longer any real penalty in doing so.
+libvibrant.$(so):
+	ln -s libvibrantOGL.$(so) $@
+libncbicn3d.$(so):
+	ln -s libncbicn3dOGL.$(so) $@
+
+libblast_deps       = libblastcompadj.$(so) libncbi.$(so)
+libblast_sysdeps    = -lm
+libblastapi_deps    = libblast.$(so) libncbitool.$(so) libncbiobj.$(so) \
+                      libncbi.$(so)
+libblastapi_sysdeps = -lm
+libblastcompadj_sysdeps = -lm
+libncbi_sysdeps     = -lm
+# libncbiCacc_deps    = libncbicdr.$(so) libnetentr.a libnetcli.$(so)
+libncbiNacc_deps    = libncbicdr.$(so) libnetentr.a libnetcli.$(so) \
+                      libncbiobj.$(so) libncbi.$(so)
+libncbiNacc_sysdeps = -lm
+# libncbiacc_deps     = libncbicdr.$(so)
+libncbicdr_deps     = libncbiobj.$(so) libncbi.$(so)
+libncbiid1_deps     = libncbiobj.$(so) libnetcli.$(so) libncbi.$(so)
+libncbimla_deps     = libncbiobj.$(so) libnetcli.$(so) libncbi.$(so)
+libncbimmdb_deps    = libncbiid1.$(so) libncbitool.$(so) libncbiobj.$(so) \
+                      libncbi.$(so)
+libncbimmdb_sysdeps = -lm
+libncbiobj_deps     = libncbi.$(so)
+libncbiobj_sysdeps  = -lm
+libncbitool_deps    = libblastcompadj.$(so) libncbiobj.$(so) libncbi.$(so)
+libncbitool_sysdeps = -lm
+libncbitxc2_deps    = libncbitool.$(so) libnetcli.$(so) libncbiobj.$(so) \
+                      libncbi.$(so)
+libncbitxc2_sysdeps = -lm
+libnetblast_deps    = libncbitool.$(so) libnetcli.$(so) libncbiobj.$(so) \
+                      libncbi.$(so)
+libnetcli_deps      = libncbi.$(so)
+# libnetentr_deps     = libncbiacc.$(so) libnetcli.$(so)
+libvibgif_deps      = libncbi.$(so)
+libvibgif_sysdeps   = -lm
+
+libddvlib_deps        = libncbidesk.$(so) libvibrantOGL.$(so) \
+                        libncbitool.$(so) libncbiobj.$(so) libncbi.$(so)
+libncbicn3d_deps      = libncbiNacc.$(so) libddvlib.$(so) libncbidesk.$(so) \
+                        libncbimmdb.$(so) libncbitool.$(so) libncbiobj.$(so) \
+                        libncbi.$(so)
+libncbicn3dOGL_deps   = $(libncbicn3d_deps) libvibrantOGL.$(so)
+libncbicn3dOGL_sysdeps = -lm
+libncbidesk_deps      = libblastapi.$(so) libncbimmdb.$(so) libncbitool.$(so) \
+                        libvibrantOGL.$(so) libncbiobj.$(so) libncbi.$(so)
+libncbidesk_sysdeps   = -lm
+libvibnet_deps        = libncbiNacc.$(so) libncbidesk.$(so) libncbimmdb.$(so) \
+                        libvibrantOGL.$(so) libncbitool.$(so) \
+                        libncbicdr.$(so) libncbiobj.$(so) libncbi.$(so)
+# libvibrant_deps     = libncbi.$(so)
+# libvibrant_sysdeps  = $(VIBLIBS)
+# for ddvcolor stuff
+libvibrantOGL_deps    = libncbiobj.$(so) libncbi.$(so)
+libvibrantOGL_sysdeps = $(OGLLIBS) $(VIBLIBS) -lm
+
+# XXX - is there a way to express these programmatically?
+libblast.$(so):    $(libblast_deps)
+libblastapi.$(so): $(libblastapi_deps)
+# libncbiCacc.$(so): $(libncbiCacc_deps)
+libncbiNacc.$(so): $(libncbiNacc_deps)
+# libncbiacc.$(so):  $(libncbiacc_deps)
+libncbicdr.$(so):  $(libncbicdr_deps)
+libncbiid1.$(so):  $(libncbiid1_deps)
+libncbimla.$(so):  $(libncbimla_deps)
+libncbimmdb.$(so): $(libncbimmdb_deps)
+libncbiobj.$(so):  $(libncbiobj_deps)
+libncbitool.$(so): $(libncbitool_deps)
+libncbitxc2.$(so): $(libncbitxc2_deps)
+libnetblast.$(so): $(libnetblast_deps)
+libnetcli.$(so):   $(libnetcli_deps)
+# libnetentr.$(so): $(libnetentr_deps)
+
+libddvlib.$(so):      $(libddvlib_deps)
+# libncbicn3d.$(so):  $(libncbicn3d_deps)
+libncbicn3dOGL.$(so): $(libncbicn3dOGL_deps)
+libncbidesk.$(so):    $(libncbidesk_deps)
+libvibgif.$(so):      $(libvibgif_deps)
+libvibnet.$(so):      $(libvibnet_deps)
+# libvibrant.$(so):   $(libvibrant_deps)
+libvibrantOGL.$(so):  $(libvibrantOGL_deps)

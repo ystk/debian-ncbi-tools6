@@ -1,4 +1,4 @@
-.TH ASNTOOL 1 2005-05-16 NCBI "NCBI Tools User's Manual"
+.TH ASNTOOL 1 2010-09-01 NCBI "NCBI Tools User's Manual"
 .SH NAME
 asntool \- process ASN.1 module specifications
 .SH SYNOPSIS
@@ -13,6 +13,7 @@ asntool \- process ASN.1 module specifications
 [\|\fB\-L\fP\ \fIstr\fP\|]
 [\|\fB\-M\fP\ \fIfilename,...\fP\|]
 [\|\fB\-P\fP\ \fIstr\fP\|]
+[\|\fB\-Q\fP\|]
 [\|\fB\-S\fP\ \fIfilename\fP\|]
 [\|\fB\-T\fP\ \fIfilename\fP\|]
 [\|\fB\-V\fP\|]
@@ -76,6 +77,9 @@ Search the ASN.1 modules in \fIfilename,...\fP for external references
 .TP
 \fB\-P\fP\ \fIstr\fP
 XML module prefix for \fBDOCTYPE\fP
+.TP
+\fB\-Q\fP
+Use quoted syntax form for generated include files
 .TP
 \fB\-S\fP\ \fIfilename\fP
 Send debugging output to \fIfilename\fP rather than stderr

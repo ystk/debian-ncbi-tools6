@@ -8,7 +8,7 @@
 delay_sec="$1"
 delay_sec=${delay_sec:="10"}
 netcat="`which netcat 2>/dev/null`"
-temp="/tmp/`basename $0`.$$.tmp"
+temp=`mktemp`
 helper="./fwd_failure_helper.exe"
 test -z "$netcat"  &&  netcat="`whereis netcat | sed 's/^[^:]*://;s/ //g'`"
 
